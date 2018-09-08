@@ -102,6 +102,38 @@ function rectangle(start, state, dispatch) {
 }
 
 
+function circle(pos, state, dispatch) {
+	function hypotenuse(a, b) {
+		return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+	}
+	
+	function isInsideCanvas(x, y) {
+		if (x < 0 || x > state.picture.width ||
+		    y < 0 || y > state.picture.height) return false;
+		return true;
+	}
+	
+	function drawCircle(to) {
+		let radius = hypotenuse(to.x - pos.x, to.y - pos.y);
+		let radiusC = Math.ceil(radius);
+		let drawn = [];
+
+		for (let y = pos.y - radiusC; y < pos.y + radiusC; y++) {
+			for (let x = pos.x - radiusC; x < pos.x + radiusC; x++) {
+				if (hypotenuse(pos.x - x, pos.y - y) < radius && isInsideCanvas(x, y)) {
+					drawn.push({x, y, color: state.color});
+				}
+			}
+		}
+
+		dispatch({picture: state.picture.draw(drawn)});
+	}
+
+	drawCircle(pos);
+	return drawCircle;
+}
+
+
 const around = [
 	{dx: -1, dy: 0},
 	{dx: 1, dy: 0},
@@ -440,7 +472,7 @@ const startState = {
 	done: [],
 	doneAt: 0
 };
-const baseTools = { draw, fill, rectangle, pick };
+const baseTools = { draw, fill, rectangle, pick, circle };
 const baseControls = [ ToolSelect, ColorSelect, SaveButton, LoadButton, UndoButton ];
 
 
